@@ -54,7 +54,7 @@ class GomokuGame:
         self.game_over = False
         self.winner = None
 
-    def draw(self):
+    def _draw(self):
         self.display.fill(BACKGROUND)
 
         for i in range(TABLE_SIZE + 1):
@@ -63,7 +63,7 @@ class GomokuGame:
                 TABLE_LINES,
                 (TABLE_MARGIN, TABLE_MARGIN + i * BLOCK_SIZE),
                 (
-                    TABLE_MARGIN + (TABLE_SIZE) * BLOCK_SIZE,
+                    TABLE_MARGIN + TABLE_SIZE * BLOCK_SIZE,
                     TABLE_MARGIN + i * BLOCK_SIZE,
                 ),
             )
@@ -73,7 +73,7 @@ class GomokuGame:
                 (TABLE_MARGIN + i * BLOCK_SIZE, TABLE_MARGIN),
                 (
                     TABLE_MARGIN + i * BLOCK_SIZE,
-                    TABLE_MARGIN + (TABLE_SIZE) * BLOCK_SIZE,
+                    TABLE_MARGIN + TABLE_SIZE * BLOCK_SIZE,
                 ),
             )
 
@@ -123,7 +123,6 @@ class GomokuGame:
                 pygame.quit()
                 quit()
 
-            # mouse click
             if event.type == pygame.MOUSEBUTTONUP:
                 x, y = event.pos
                 x = (x - TABLE_MARGIN) // BLOCK_SIZE
@@ -135,24 +134,26 @@ class GomokuGame:
 
                     if self.table[y][x] == 0:
                         self.table[y][x] = self.current_player
-                        self.pieces_used += 1
-                        self.current_player = (
-                            PLAYER_1 if self.current_player == PLAYER_2 else PLAYER_2
-                        )
                 except:
                     pass
-
-        self.draw()
 
         if x == None or y == None:
             return False, None
 
+        self.pieces_used += 1
+        self.current_player = PLAYER_1 if self.current_player == PLAYER_2 else PLAYER_2
+
+        self._draw()
+
+        return self._check_win(x, y, current_player)
+
+    def _check_win(self, current_x, current_y, player):
         # check win
         # iterates MIN_PIECES_TO_WIN times in each direction and their opposite
         max_connected = 0
         for dir in DIRECTIONS:
             connected = 1
-            position = (y, x)
+            position = (current_y, current_x)
             for i in range(MIN_PIECES_TO_WIN):
                 position = (position[0] + dir[0], position[1] + dir[1])
                 if (
@@ -163,12 +164,13 @@ class GomokuGame:
                 ):
                     break
 
-                if self.table[position[0]][position[1]] == current_player:
+                if self.table[position[0]][position[1]] == player:
                     connected += 1
                 else:
                     break
 
-            position = (y, x)
+            # check opposite direction
+            position = (current_y, current_x)
 
             for i in range(MIN_PIECES_TO_WIN):
                 position = (position[0] - dir[0], position[1] - dir[1])
@@ -180,7 +182,7 @@ class GomokuGame:
                 ):
                     break
 
-                if self.table[position[0]][position[1]] == current_player:
+                if self.table[position[0]][position[1]] == player:
                     connected += 1
                 else:
                     break
@@ -190,7 +192,7 @@ class GomokuGame:
 
         if max_connected >= MIN_PIECES_TO_WIN:
             self.game_over = True
-            self.winner = current_player
+            self.winner = player
             return self.game_over, self.winner
 
         # check draw
@@ -199,13 +201,13 @@ class GomokuGame:
             self.winner = None
             return self.game_over, self.winner
 
-        return False, None
+        return self.game_over, self.winner
 
 
 if __name__ == "__main__":
     game = GomokuGame()
 
-    game.draw()
+    game._draw()
 
     while True:
         game_over, winner = game.play_step()
