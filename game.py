@@ -9,10 +9,10 @@ PLAYER_1 = 1
 PLAYER_2 = 2
 
 DIRECTIONS = [
-    (0, 1),
-    (1, 0),
-    (1, 1),
-    (1, -1),
+    (0, 1),  # right
+    (1, 0),  # down
+    (1, 1),  # down right
+    (1, -1),  # down left
 ]
 
 
@@ -20,7 +20,12 @@ class GomokuGame:
     def __init__(self):
         self.reset()
 
-    def reset(self, table_size=TABLE_SIZE, max_pieces=MAX_PIECES, min_pieces_to_win=MIN_PIECES_TO_WIN):
+    def reset(
+        self,
+        table_size=TABLE_SIZE,
+        max_pieces=MAX_PIECES,
+        min_pieces_to_win=MIN_PIECES_TO_WIN,
+    ):
         self.table_size = table_size
         self.max_pieces = max_pieces
         self.min_pieces_to_win = min_pieces_to_win
