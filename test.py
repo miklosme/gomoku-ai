@@ -8,20 +8,15 @@ class GomokuTest(GomokuGameGUI):
 
 
 def debug_state(game):
-    # print(game.table)
-    # print(game.table.shape)
-
     other_player = PLAYER_1 if game.current_player == PLAYER_2 else PLAYER_2
 
     current_player_pieces = np.where(game.table == game.current_player, 1, 0)
     other_player_pieces = np.where(game.table == other_player, 1, 0)
 
     map = current_player_pieces - other_player_pieces
+    flat = np.array(map, dtype=int).flatten()
 
-    # print(np.array(map, dtype=int))
-
-    # convert a 2D array to a 1D array
-    print(np.array(map, dtype=int).flatten())
+    print(flat)
 
 
 if __name__ == "__main__":
