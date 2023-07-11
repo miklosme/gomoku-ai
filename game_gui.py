@@ -23,22 +23,22 @@ pygame.init()
 font = pygame.font.SysFont("arial", 25)
 
 
-class GomokuGameGUI:
+class GomokuGameGUI(GomokuGame):
     def __init__(self):
-        self.game = GomokuGame()
+        super().__init__()
         self.display = pygame.display.set_mode((640, 480))
         pygame.display.set_caption("Gomoku")
 
     def _draw(self):
         self.display.fill(BACKGROUND)
 
-        for i in range(self.game.table_size + 1):
+        for i in range(self.table_size + 1):
             pygame.draw.line(
                 self.display,
                 TABLE_LINES,
                 (TABLE_MARGIN, TABLE_MARGIN + i * BLOCK_SIZE),
                 (
-                    TABLE_MARGIN + self.game.table_size * BLOCK_SIZE,
+                    TABLE_MARGIN + self.table_size * BLOCK_SIZE,
                     TABLE_MARGIN + i * BLOCK_SIZE,
                 ),
             )
@@ -48,13 +48,13 @@ class GomokuGameGUI:
                 (TABLE_MARGIN + i * BLOCK_SIZE, TABLE_MARGIN),
                 (
                     TABLE_MARGIN + i * BLOCK_SIZE,
-                    TABLE_MARGIN + self.game.table_size * BLOCK_SIZE,
+                    TABLE_MARGIN + self.table_size * BLOCK_SIZE,
                 ),
             )
 
-        for i in range(self.game.table_size):
-            for j in range(self.game.table_size):
-                if self.game.table[i][j] == PLAYER_1:
+        for i in range(self.table_size):
+            for j in range(self.table_size):
+                if self.table[i][j] == PLAYER_1:
                     pygame.draw.rect(
                         self.display,
                         PLAYER_1_COLOR,
@@ -65,7 +65,7 @@ class GomokuGameGUI:
                             BLOCK_SIZE,
                         ),
                     )
-                elif self.game.table[i][j] == PLAYER_2:
+                elif self.table[i][j] == PLAYER_2:
                     pygame.draw.rect(
                         self.display,
                         PLAYER_2_COLOR,
@@ -79,16 +79,16 @@ class GomokuGameGUI:
 
         text = font.render(
             "Current player: "
-            + get_player_name(self.game.current_player)
+            + get_player_name(self.current_player)
             + " | Pieces used: "
-            + str(self.game.pieces_used),
+            + str(self.pieces_used),
             True,
             (0, 0, 0),
         )
         self.display.blit(text, [0, 0])
         pygame.display.flip()
 
-    def play_step(self):
+    def loop(self):
         x = None
         y = None
 
@@ -106,7 +106,7 @@ class GomokuGameGUI:
             return False, None
 
         try:
-            game_over, winner = self.game.play_step(x, y)
+            game_over, winner = super().play_step(x, y)
         except:
             print("Invalid move")
             return False, None
@@ -115,6 +115,9 @@ class GomokuGameGUI:
 
         return game_over, winner
 
+    def exit(self):
+        pygame.quit()
+
 
 if __name__ == "__main__":
     game = GomokuGameGUI()
@@ -122,11 +125,13 @@ if __name__ == "__main__":
     game._draw()
 
     while True:
-        game_over, winner = game.play_step()
+        game_over, winner = game.loop()
 
         if game_over == True:
+            print(
+                "Result:",
+                "Draw" if winner == None else get_player_name(winner) + " wins",
+            )
             break
 
-    print("Result:", "Draw" if winner == None else get_player_name(winner) + " wins")
-
-    pygame.quit()
+    game.exit()
