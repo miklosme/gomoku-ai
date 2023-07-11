@@ -88,7 +88,7 @@ class GomokuGameGUI(GomokuGame):
         self.display.blit(text, [0, 0])
         pygame.display.flip()
 
-    def loop(self):
+    def loop(self, on_change=None):
         x = None
         y = None
 
@@ -112,6 +112,9 @@ class GomokuGameGUI(GomokuGame):
             return False, None
 
         self._draw()
+
+        if on_change != None:
+            on_change(self)
 
         return game_over, winner
 
